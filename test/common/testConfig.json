@@ -16,7 +16,10 @@
      "backend": [
         {
             "pattern":"/404backend",
-            "target":"http://localhost:5001/404backend"
+            "target":"http://localhost:5001/404backend",
+            "statusCodeLogLevel": {
+                "404": "warn"
+            }
         },
         {
             "pattern":"/alternate500",

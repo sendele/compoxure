@@ -33,7 +33,8 @@ function getMiddleware(config, reliableGet, eventHandler) {
                 optionsHeaders = {
                     'cx-page-url': templateVars['url:href'],
                     'x-tracer': req.tracer
-                }
+                },
+                statusCodeLogLevel = {};
             if (req.cookies && req.headers.cookie) {
                 var whitelist = config.cookies && config.cookies.whitelist;
                 optionsHeaders.cookie = whitelist ? utils.filterCookies(whitelist, req.cookies) : req.headers.cookie;
@@ -41,6 +42,21 @@ function getMiddleware(config, reliableGet, eventHandler) {
             if (config.cdn) {
                 if(config.cdn.host) { optionsHeaders['x-cdn-host'] = config.cdn.host; }
                 if(config.cdn.url) { optionsHeaders['x-cdn-url'] = config.cdn.url; }
+            }
+
+            var statusCodeLogLevelAttr = getCxAttr(fragment, 'cx-status-code-log-level');
+            if (statusCodeLogLevelAttr) {
+                statusCodeLogLevelAttr = statusCodeLogLevelAttr.replace(/\s/g,'');
+                var statusCodeArr = statusCodeLogLevelAttr.split(',');
+                _.each(statusCodeArr, function(item) {
+                    var statusCodeLevelArr = item.split(':');
+
+                    if (statusCodeLevelArr.length !== 2) {
+                        return;
+                    }
+
+                    statusCodeLogLevel[statusCodeLevelArr[0]] = statusCodeLevelArr[1];
+                });
             }
 
             options = {
@@ -76,10 +92,17 @@ function getMiddleware(config, reliableGet, eventHandler) {
             };
 
             var logError = function(err, message, ignoreError) {
-               var logLevel = err.statusCode === 404 || ignoreError ? 'warn' : 'error';
-               eventHandler.logger(logLevel, message, {
-                  tracer: req.tracer
-               });
+                var logLevel = 'error';
+
+                if (ignoreError) {
+                    logLevel = 'warn';
+                } else {
+                    logLevel = statusCodeLogLevel[err.statusCode] || logLevel;
+                }
+
+                eventHandler.logger(logLevel, message, {
+                    tracer: req.tracer
+                });
             }
 
             var onErrorHandler = function(err, oldCacheData) {

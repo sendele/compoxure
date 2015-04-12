@@ -36,6 +36,7 @@ module.exports = function backendProxyMiddleware(config, eventHandler) {
             targetCacheKey = backend.cacheKey || utils.urlToCacheKey(targetUrl),
             targetCacheTTL = utils.timeToMillis(backend.ttl || '30s'),
             explicitNoCache = backend.noCache || req.explicitNoCache,
+            statusCodeLogLevel = backend.statusCodeLogLevel || {},
             options;
 
         if (config.cdn && config.cdn.url) { backendHeaders['x-cdn-url'] = config.cdn.url; }
@@ -71,10 +72,11 @@ module.exports = function backendProxyMiddleware(config, eventHandler) {
         };
 
         var logError = function(err, message) {
-           var logLevel = err.statusCode === 404 ? 'warn' : 'error';
-           eventHandler.logger(logLevel, message, {
-              tracer: req.tracer
-           });
+          var logLevel = statusCodeLogLevel[err.statusCode] || 'error';
+
+          eventHandler.logger(logLevel, message, {
+            tracer: req.tracer
+          });
         }
 
         var handleError = function(err, oldCacheData) {
