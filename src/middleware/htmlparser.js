@@ -58,7 +58,13 @@ function getMiddleware(config, reliableGet, eventHandler) {
                 headers: optionsHeaders,
                 tracer: req.tracer,
                 statsdKey: statsdKey
+            };
+
+            if (req.experiments) {
+                var experimentBucket = Object.keys(req.experiments).sort().map(function(k) { return k + '_' + req.experiments[k]; }).join('_');
+                options.cacheKey = options.cacheKey + '_' + experimentBucket;
             }
+
 
             var setResponseHeaders = function(headers) {
                 if (res.headersSent) { return; } // ignore late joiners
