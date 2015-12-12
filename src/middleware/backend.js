@@ -34,12 +34,8 @@ module.exports = function(config)  {
       req.backend = _.clone(_.defaults(req.backend, backendDefaults));
       req.backend.target = utils.render(req.backend.target, req.templateVars);
       req.backend.cacheKey = req.backend.cacheKey ? utils.render(req.backend.cacheKey, req.templateVars) : null;
-      if (req.experiments) {
-        var experimentBucket = Object.keys(req.experiments).sort().map(function(k) { return k + '_' + req.experiments[k]; }).join('_');
-        req.backend.cacheKey = req.backend.cacheKey + '_' + experimentBucket;
-      }
 
       return next();
     }
   }
-}
+};

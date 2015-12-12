@@ -108,19 +108,37 @@ module.exports = function backendProxyMiddleware(config, eventHandler) {
           }
         }
 
-        reliableGet.get(options, function(err, response) {
-          if(err) {
-            handleError(err, response);
-          } else {
-            req.templateVars = utils.updateTemplateVariables(req.templateVars, response.headers);
-            if(response.headers['set-cookie']) {
-              res.setHeader('set-cookie', response.headers['set-cookie']);
-            }
-            res.parse(response.content);
-          }
-        });
 
+        var addCacheKeySuffix = function(next) {
+          if (!req.cacheKeySuffix) {
+            return next();
+          }
+
+          req.cacheKeySuffix(targetUrl, req.cookies, function(suffix) {
+            return next(suffix);
+          });
+        };
+
+        var reliableGetOp = function(suffix) {
+          if (suffix) {
+            options.cacheKey = options.cacheKey + '_' + suffix;
+          }
+
+          reliableGet.get(options, function (err, response) {
+            if (err) {
+              handleError(err, response);
+            } else {
+              req.templateVars = utils.updateTemplateVariables(req.templateVars, response.headers);
+              if (response.headers['set-cookie']) {
+                res.setHeader('set-cookie', response.headers['set-cookie']);
+              }
+              res.parse(response.content);
+            }
+          });
+        };
+
+        addCacheKeySuffix(reliableGetOp);
       });
 
     }
-}
+};

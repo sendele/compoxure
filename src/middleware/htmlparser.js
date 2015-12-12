@@ -60,12 +60,6 @@ function getMiddleware(config, reliableGet, eventHandler) {
                 statsdKey: statsdKey
             };
 
-            if (req.experiments) {
-                var experimentBucket = Object.keys(req.experiments).sort().map(function(k) { return k + '_' + req.experiments[k]; }).join('_');
-                options.cacheKey = options.cacheKey + '_' + experimentBucket;
-            }
-
-
             var setResponseHeaders = function(headers) {
                 if (res.headersSent) { return; } // ignore late joiners
                 var hasCacheControl = function(headers, value) {
@@ -147,13 +141,30 @@ function getMiddleware(config, reliableGet, eventHandler) {
 
             };
 
-            reliableGet.get(options, function(err, response) {
-                if(err) {
-                    return onErrorHandler(err, response);
+            var addCacheKeySuffix = function(next) {
+                if (!req.cacheKeySuffix) {
+                  return next();
                 }
-                responseCallback(null, response.content, response.headers);
-            });
 
+                req.cacheKeySuffix(url, req.cookies, function(suffix) {
+                  return next(suffix);
+                });
+            };
+
+            var reliableGetOp = function(suffix) {
+                if (suffix) {
+                  options.cacheKey = options.cacheKey + '_' + suffix;
+                }
+
+                reliableGet.get(options, function (err, response) {
+                    if (err) {
+                        return onErrorHandler(err, response);
+                    }
+                    responseCallback(null, response.content, response.headers);
+                });
+            };
+
+            addCacheKeySuffix(reliableGetOp);
         }
 
         res.parse = function(data) {
