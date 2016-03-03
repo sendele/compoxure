@@ -1,4 +1,5 @@
 var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 var ware = require('ware');
 
 module.exports = function(config, eventHandler, optionsTransformer) {
@@ -27,6 +28,7 @@ module.exports = function(config, eventHandler, optionsTransformer) {
                     .use(rejectUnsupportedMediaType)
                     .use(passThrough)
                     .use(cookieParser)
+                    .use(bodyParser.urlencoded({extended: true}))
                     .use(backendProxyMiddleware);
 
   return function(req, res) {

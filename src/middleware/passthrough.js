@@ -6,6 +6,7 @@ module.exports = function(req, res, next) {
 
     var isPassThrough = function(req) {
       if (!req.backend.passThrough) { return false }
+      if (req.method === 'POST' && req.headers['cx-debug']) { return false; }
       if (req.method !== 'GET') { return true; }
       if (req.contentType === 'text/html') { return false; }
       if (req.contentType === 'html') { return false; }
