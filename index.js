@@ -28,7 +28,7 @@ module.exports = function(config, eventHandler, optionsTransformer) {
                     .use(rejectUnsupportedMediaType)
                     .use(passThrough)
                     .use(cookieParser)
-                    .use(bodyParser.urlencoded({extended: true}))
+                    .use(bodyParser.text({type: 'text/compoxure'}))
                     .use(backendProxyMiddleware);
 
   return function(req, res) {
