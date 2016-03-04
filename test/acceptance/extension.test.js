@@ -11,7 +11,8 @@ var stubServer = require('../common/stubServer');
 var pcServer = require('../common/pcServer');
 
 describe("Page Composer with Browser Extension config enabled", function(){
-    var stubServerPort = 5082;
+    var stubServerPort = 5011;
+    var pageComposerPort = 5010;
 
     this.timeout(5000);
     this.slow(3000);
@@ -37,7 +38,7 @@ describe("Page Composer with Browser Extension config enabled", function(){
     }
 
     function initPageComposer(next) {
-        pcServer.init(stubServerPort, 'localhost', createEventHandler(), null, true)(next);
+        pcServer.init(pageComposerPort, 'localhost', createEventHandler(), null, true)(next);
     }
 
     function getPageComposerUrl(path, search) {
@@ -45,7 +46,7 @@ describe("Page Composer with Browser Extension config enabled", function(){
         var url = require('url').format({
             protocol: 'http',
             hostname: 'localhost',
-            port: stubServerPort,
+            port: pageComposerPort,
             pathname: path,
             search: search
         });
