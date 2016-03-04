@@ -11,7 +11,7 @@ var stubServer = require('../common/stubServer');
 var pcServer = require('../common/pcServer');
 
 describe("Page Composer with Browser Extension config enabled", function(){
-    var stubServerPort = 5010;
+    var stubServerPort = 5082;
 
     this.timeout(5000);
     this.slow(3000);
