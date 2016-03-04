@@ -434,4 +434,6 @@ The final option is to simply build a service that's purpose in life is aggregat
 
 ### Debugging compoxure parsing
 
-To test the parsing functionality, set Content-Type to `text/compoxure` and POST the template string
+To test the parsing functionality using the browser extension: 
+- configuration should have `enableExtension = true` 
+- POST the template string with `Content-Type: text/compoxure` 
