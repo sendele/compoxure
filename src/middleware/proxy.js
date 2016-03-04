@@ -128,7 +128,7 @@ module.exports = function backendProxyMiddleware(config, eventHandler, optionsTr
         optionsTransformer(req, options, function(err, transformedOptions) {
           if (err) { return handleError(err); }
 
-          if (req.method === 'POST' && req.is('text/compoxure')) {
+          if (config.enableExtension && req.method === 'POST' && req.is('text/compoxure')) {
             res.parse(req.body);
             return;
           }
