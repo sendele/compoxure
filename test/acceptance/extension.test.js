@@ -34,7 +34,7 @@ describe("Page Composer with Browser Extension config enabled", function(){
     }
 
     function initStubServer(next) {
-        stubServer.init('pageComposerTest.html', stubServerPort,'localhost')(next);
+        stubServer.init('pageComposerTest.html', stubServerPort, 'localhost')(next);
     }
 
     function initPageComposer(next) {
@@ -56,7 +56,7 @@ describe("Page Composer with Browser Extension config enabled", function(){
 
     context('Browser extension', function() {
         var template =
-            "<div id='declarative' cx-replace-outer='true' cx-url='{{server:local}}/replaced' cx-cache-ttl='1' cx-cache-key='replace:declarative:browser-extension' cx-timeout='1s' class='block'>" +
+            "<div id='declarative' cx-replace-outer='true' cx-url='{{server:local-extension}}/browser-extension-backend' cx-cache-ttl='1' cx-cache-key='replace:browser-extension' cx-timeout='1s' class='block'>" +
             "Content to be replaced via a directive" +
             "</div>";
 
@@ -65,8 +65,8 @@ describe("Page Composer with Browser Extension config enabled", function(){
                 headers: {'Content-Type': 'text/compoxure'},
                 body: template
             };
-            request.post(getPageComposerUrl('post'), requestOpts, function(err, response, content) {
-                expect(content).to.be('Replaced');
+            request.post(getPageComposerUrl('browser-extension'), requestOpts, function(err, response, content) {
+                expect(content).to.be('Browser extension working');
                 done();
             });
         });
@@ -75,8 +75,8 @@ describe("Page Composer with Browser Extension config enabled", function(){
             var requestOpts = {
                 body: template
             };
-            request.post(getPageComposerUrl('post'), requestOpts, function(err, response, content) {
-                expect(content).to.be('POST undefined');
+            request.post(getPageComposerUrl('browser-extension'), requestOpts, function(err, response, content) {
+                expect(content).to.be('Service http://localhost:5011/browser-extension-not-parsed responded with status code 404');
                 done();
             });
         });
